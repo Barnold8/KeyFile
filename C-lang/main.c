@@ -28,6 +28,24 @@ FILE* openFile(char* path){
 
 }
 
+void sendKey(int key){
+
+    INPUT ip;
+    
+    UINT mappedKey = MapVirtualKey(LOBYTE(key), 0);
+
+    ip.type = INPUT_KEYBOARD;
+    ip.ki.wVk = 0; // virtual-key code for the "a" key
+
+    ip.ki.time = 0;
+    ip.ki.dwExtraInfo = 0;
+
+    ip.ki.wScan = mappedKey;
+    ip.ki.dwFlags = 0 | KEYEVENTF_SCANCODE; // 0 for key press
+
+    SendInput(1, &ip, sizeof(INPUT));
+}
+
 void loadChars(INPUT* chars, char* path, int size){
 
     char currChar;
@@ -91,6 +109,7 @@ int main(int argc, char *argv[]){
     int charCount = 0;
     FILE * f;
     char currChar;
+    INPUT ip;
  
     if(argc < 2 || argc > 3){
         printf("USAGE: main.exe [filePath] [sleepTimer : seconds]\n");
@@ -103,17 +122,25 @@ int main(int argc, char *argv[]){
 
     time = (argc == 3) ? atoi(argv[2])*1000 : 5000;
 
-    charCount = getCharCount("test.txt")*2; // times by two to allow for keyUp events
+    
 
-    INPUT* fileStr = allocInputs(charCount); 
+    // INPUT* fileStr = allocInputs(charCount); 
 
-    loadChars(fileStr,argv[1],charCount);
+
+
+    // loadChars(fileStr,argv[1],charCount);
 
     Sleep(time);
 
-    SendInput(charCount,fileStr,sizeof(INPUT));
 
-    free(fileStr);
+    sendKey('c'-32);
+    sendKey('l'-32);
+    sendKey('s'-32);
+
+
+    // SendInput(charCount,fileStr,sizeof(INPUT));
+
+    // free(fileStr);
 
     return 0;
 }
