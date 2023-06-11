@@ -12,29 +12,9 @@ int getCharCount(char* path){
     while((currChar = fgetc(openedFile)) != EOF){
         chars++;
     }
-
     return chars;
-
-
 }
 
-void sendKey(INPUT* fileStr, int key){
-
-    INPUT ip = *fileStr;
-
-    ip.ki.wVk = key; 
-    ip.ki.dwFlags = 0; 
-    SendInput(1, &ip, sizeof(fileStr));
-
-}
-
-FILE* openFile(char* path){
-
-    FILE *fptr;
-    fptr = fopen(path,"r");
-    return fptr;
-
-}
  // initialise fileStr
 int main(int argc, char *argv[]){
 
@@ -82,7 +62,7 @@ int main(int argc, char *argv[]){
 
     // SendInput(4,in,sizeof(INPUT));
 
-    printf("File char count is %d\n",getCharCount("test.txt"));
+    
    
 
     return 0;
