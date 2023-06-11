@@ -3,17 +3,28 @@
 #define WINVER 0x0500 // Tells windows we are win 2000 or later
 
 
-// ip.ki.wVk = 0x41; 
-// ip.ki.dwFlags = 0; 
-// SendInput(1, &ip, sizeof(INPUT));
+int getCharCount(char* path){
+
+    int chars = 0;
+    char currChar;
+    FILE* openedFile = fopen(path,"r");
+
+    while((currChar = fgetc(openedFile)) != EOF){
+        chars++;
+    }
+
+    return chars;
 
 
+}
 
-void sendKey(INPUT input, int key){
+void sendKey(INPUT* fileStr, int key){
 
-    input.ki.wVk = key; 
-    input.ki.dwFlags = 0; 
-    SendInput(1, &input, sizeof(INPUT));
+    INPUT ip = *fileStr;
+
+    ip.ki.wVk = key; 
+    ip.ki.dwFlags = 0; 
+    SendInput(1, &ip, sizeof(fileStr));
 
 }
 
@@ -24,13 +35,20 @@ FILE* openFile(char* path){
     return fptr;
 
 }
-
+ // initialise fileStr
 int main(int argc, char *argv[]){
 
     int time = 0;
+    FILE * f;
+    char currChar;
+    INPUT fileStr[4];
 
     if(argc < 2 || argc > 3){
         printf("USAGE: main.exe [filePath] [sleepTimer : seconds]\n");
+        return -1;
+    }
+    if (!( f = openFile(argv[1]))){
+        printf("Error: cannot find file %s\n",argv[1]);
         return -1;
     }
 
@@ -38,15 +56,34 @@ int main(int argc, char *argv[]){
 
     Sleep(time);
 
-    // initialise input
+    INPUT in[4] = {0}; // four inputs
 
-    INPUT ip;
-    ip.type = INPUT_KEYBOARD;
-    ip.ki.wScan = 0;
-    ip.ki.time = 0;
-    ip.ki.dwExtraInfo = 0;
-    
+    // first input 0x53
+    // in[0].type=INPUT_KEYBOARD;
+    // in[0].ki.wScan=0;
+    // in[0].ki.dwFlags=0;
+    // in[0].ki.time=0;
+    // in[0].ki.dwExtraInfo=0;
+    // in[0].ki.wVk=0x53;
 
+    // in[1] = in[0];
+    // in[1].ki.dwFlags |= KEYEVENTF_KEYUP;
+
+    // // second input 0x54
+    // in[2].type=INPUT_KEYBOARD;
+    // in[2].ki.wScan=0;
+    // in[2].ki.dwFlags=0;
+    // in[2].ki.time=0;
+    // in[2].ki.dwExtraInfo=0;
+    // in[2].ki.wVk=0x54;
+
+    // in[3] = in[2];
+    // in[3].ki.dwFlags |= KEYEVENTF_KEYUP;
+
+    // SendInput(4,in,sizeof(INPUT));
+
+    printf("File char count is %d\n",getCharCount("test.txt"));
+   
 
     return 0;
 }
