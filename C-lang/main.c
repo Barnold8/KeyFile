@@ -2,24 +2,6 @@
 #include <stdio.h>
 #define WINVER 0x0500 // Tells windows we are win 2000 or later
 
-int getCharCount(char* path){
-
-    int chars = 0;
-    char currChar;
-    FILE* openedFile = fopen(path,"r");
-
-    while((currChar = fgetc(openedFile)) != EOF){
-        chars++;
-    }
-    return chars;
-}
-
-INPUT* allocInputs(int size){
-
-    INPUT* inputs = (INPUT*)malloc(sizeof(INPUT)*size); 
-    return inputs;
-}
-
 FILE* openFile(char* path){
 
     FILE *fptr;
@@ -46,69 +28,48 @@ void sendKey(int key){
     SendInput(1, &ip, sizeof(INPUT));
 }
 
-void loadChars(INPUT* chars, char* path, int size){
+void simulateFile(char* path){
 
+    FILE *file = openFile(path);
     char currChar;
-    FILE* openedFile = fopen(path,"r");
-    int index = 0;
-    int charMin = 32;
 
-    while((currChar = fgetc(openedFile)) != EOF){
+    if(!(file)){
+        return;
+    }
 
-        printf("Curr char is %c : %d\n",currChar,currChar);
+    while((currChar = fgetc(file)) != EOF){
 
-        if(currChar > charMin){
-
-            chars[index].type=INPUT_KEYBOARD;
-            chars[index].ki.wScan=0;
-            chars[index].ki.dwFlags=0;
-            chars[index].ki.time=0;
-            chars[index].ki.dwExtraInfo=0;
-            chars[index].ki.wVk=currChar - 32;
-
-            chars[index+1] = chars[index];
-            chars[index+1].ki.dwFlags |= KEYEVENTF_KEYUP;
-
-            index += 2;
-
-        }else{
-
+        if(currChar > 32){
+            sendKey(currChar-32);
+        }
+        else{
             switch(currChar){
+
                 case 10:
-                        printf("asdeasdw %d\n",currChar);
-                        chars[index].type=INPUT_KEYBOARD;
-                        chars[index].ki.wScan=0;
-                        chars[index].ki.dwFlags=0;
-                        chars[index].ki.time=0;
-                        chars[index].ki.dwExtraInfo=0;
-                        chars[index].ki.wVk=32;
-
-                        chars[index+1] = chars[index];
-                        chars[index+1].ki.dwFlags |= KEYEVENTF_KEYUP;
-
-                        
-
+                    sendKey(0x0D);
                     break;
                 case 32:
-
-
-                default:
+                    sendKey(0x20);
                     break;
                 
+                default:
+                    break;
+
             }
-            index += 2;
         }
-    }   
- 
+        
+
+    }
+
 }
 
- // initialise fileStr
+// initialise fileStr - 
 int main(int argc, char *argv[]){
 
     int time = 0;
     int charCount = 0;
-    FILE * f;
     char currChar;
+    FILE * f;
     INPUT ip;
  
     if(argc < 2 || argc > 3){
@@ -122,20 +83,14 @@ int main(int argc, char *argv[]){
 
     time = (argc == 3) ? atoi(argv[2])*1000 : 5000;
 
-    
-
     // INPUT* fileStr = allocInputs(charCount); 
-
-
 
     // loadChars(fileStr,argv[1],charCount);
 
     Sleep(time);
 
 
-    sendKey('c'-32);
-    sendKey('l'-32);
-    sendKey('s'-32);
+    simulateFile(argv[1]);
 
 
     // SendInput(charCount,fileStr,sizeof(INPUT));
@@ -162,7 +117,7 @@ int main(int argc, char *argv[]){
 
     // // second input 0x54
     // in[2].type=INPUT_KEYBOARD;
-    // in[2].ki.wScan=0;
+    // in[2].ki.wScan=0; 
     // in[2].ki.dwFlags=0;
     // in[2].ki.time=0;
     // in[2].ki.dwExtraInfo=0;
